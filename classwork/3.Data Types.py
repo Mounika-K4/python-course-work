@@ -47,6 +47,7 @@ print(m)
 print(type(m))
 
 
+
 #frozenset type
 z=frozenset({10,20,30,40})
 print(z)
@@ -61,6 +62,7 @@ print(type(g))
 #boolen type
 u=True
 v=False
+ 
 print(u,v)
 print(type(u))
 print(type(v))
