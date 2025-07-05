@@ -14,8 +14,8 @@ a=5
 b=10
 print("Equal to(==):",a==b)                  #statement:False
 print("Not Equal to(!=):",a!=b)              #Statement:True
-print("Greater than (>=):",a>b)              #Statement:False
-print("less than(<=):",a<b)                  #Statement:True
+print("Greater than (>):",a>b)              #Statement:False
+print("less than(<):",a<b)                  #Statement:True
 print("Greater than or Equal to(>=):",a<=b)  #Statement:True
 print("less than or equal to(<=):",a<=b)     #Statement:True
 
