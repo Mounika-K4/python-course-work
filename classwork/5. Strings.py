@@ -210,3 +210,46 @@ print(name.maketrans("th","#$"))       #Output: {116:,35:,104:,36:}
 #split()
 name="x,y,z"
 print(name.split(","))            #Output: ['x','y','z']
+
+#rsplit()
+name='u,v,x,y,z'
+print(name.rsplit(",",1))        #Output:['u,v,x,y', 'z']
+
+#splitlines()
+name="mounika\nkaniyampati"
+print(name.splitlines())         #Output:['mounika', 'kaniyampati']
+
+#join()
+name="kaniyampati mouli"
+print(",".join(name))            #Output:k,a,n,i,y,a,m,p,a,t,i, ,m,o,u,l,i
+
+#partition()
+name= "python-course"
+print(name.partition("-"))        #Output:('python', '-', 'course')
+
+#rpartition()
+name="python-course"
+print(name.rpartition(","))           #Output:('', '', 'python-course')
+print(name.rpartition("-"))           #Output:('python', '-', 'course')
+
+#9.Whitespace & Trimming Methods
+#strip()
+name= "Bhavana"
+print(name.strip())               #Output:Bhavana
+
+#lstrip()
+name="----bhavana"
+print(name.lstrip("-"))           #Output:bhavana
+
+#rstrip()
+name="bhavana----"
+print(name.rstrip("-"))          #Output:bhavana
+
+#10.& Decoding Methods
+#encode()
+name="mouli"
+print(name.encode())              #Output:b'mouli'
+
+#decode()
+name=b'mouli'
+print(name.decode())             #Output:mouli
