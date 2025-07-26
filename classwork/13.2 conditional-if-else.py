@@ -7,4 +7,4 @@ if searchinput in items:
     print(f"{searchinput} found.Buy now!!!")      #output:smartwatch found.Buy now!!!
 else:
     print(f"{searchinput} is out of stock now.we will notify you")  
-                      #output:mobile is out of stock now.we will notify you
+                      #output:mobile is out of stock now.we will notify
