@@ -1,4 +1,4 @@
-
+'''
 #functional arguments and types ....
 #1.positional argu
 data=('xyz@gmail.com','xyz@123')
@@ -38,6 +38,7 @@ mail = input("Enter the mail: ")
 username = input("Enter the username : ")
 password = input("Enter the password : ")
 login(username,password)
+'''
 
 #4.Variable-Length Arguments
 #'*args' (Arbitrary Positional Arguments)
