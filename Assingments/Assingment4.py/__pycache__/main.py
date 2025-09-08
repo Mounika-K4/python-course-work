@@ -1,6 +1,6 @@
 # main.py
 
-import my_programs as mp
+import my_program as mp
 
 def menu():
     while True:
