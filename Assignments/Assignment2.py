@@ -1,208 +1,175 @@
+#WhatsApp Chat Analysis Program
+
+def get_messages():
+    messages = []
+    n = int(input("Enter the number of messages: "))
+    for _ in range(n):
+        messages.append(input())
+    return messages
+
 def count_total_messages(messages):
-    return f"Total messages: {len(messages)}"
+    return len(messages)
 
-def unique_users(messages):
-    users = {msg.split(":")[0] for msg in messages}
-    return f"Unique users: {users}"
+def identify_unique_users(messages):
+    return set(msg.split(":")[0].strip() for msg in messages)
 
-def total_words(messages):
-    words = sum(len(msg.split(":")[1].split()) for msg in messages)
-    return f"Total words: {words}"
+def count_total_words(messages):
+    return sum(len(msg.split(":")[1].strip().split()) for msg in messages)
 
-def avg_words_per_message(messages):
-    words = sum(len(msg.split(":")[1].split()) for msg in messages)
-    avg = words / len(messages) if messages else 0
-    return f"Average words per message: {round(avg, 2)}"
+def average_words_per_message(messages):
+    return round(count_total_words(messages) / len(messages), 2)
 
-def longest_message(messages):
-    longest = max(messages, key=lambda x: len(x.split(":")[1]))
-    return f"Longest message: {longest}"
+def find_longest_message(messages):
+    return max(messages, key=lambda msg: len(msg.split(":")[1].strip().split()))
 
 def most_active_user(messages):
-    counts = {}
-    for msg in messages:
-        user = msg.split(":")[0]
-        counts[user] = counts.get(user, 0) + 1
-    user = max(counts, key=counts.get)
-    return f"Most active user: {user} ({counts[user]} messages)"
+    from collections import Counter
+    users = [msg.split(":")[0].strip() for msg in messages]
+    return Counter(users).most_common(1)[0]
 
 def message_count_for_user(messages, username):
-    count = sum(1 for msg in messages if msg.startswith(username + ":"))
-    return f"Messages sent by {username}: {count}"
+    return sum(1 for msg in messages if msg.startswith(username + ":"))
 
 def most_frequent_word_by_user(messages, username):
+    from collections import Counter
     words = []
     for msg in messages:
         if msg.startswith(username + ":"):
-            words.extend(msg.split(":")[1].lower().split())
-    if not words:
-        return f"No messages from {username}"
-    from collections import Counter
-    word, freq = Counter(words).most_common(1)[0]
-    return f"Most frequent word used by {username}: '{word}' ({freq} times)"
+            words.extend(msg.split(":")[1].strip().lower().split())
+    return Counter(words).most_common(1)[0] if words else ("None", 0)
 
-def first_and_last_message(messages, username):
+def first_and_last_message_by_user(messages, username):
     user_msgs = [msg for msg in messages if msg.startswith(username + ":")]
-    if not user_msgs:
-        return f"No messages from {username}"
-    return f"First: {user_msgs[0]}\nLast: {user_msgs[-1]}"
+    return user_msgs[0], user_msgs[-1] if user_msgs else ("None", "None")
 
 def check_user_presence(messages, username):
-    users = {msg.split(":")[0] for msg in messages}
-    return f"User '{username}' found" if username in users else f"User '{username}' not found"
+    return username in identify_unique_users(messages)
 
-def common_repeated_words(messages):
+def find_common_words(messages):
     from collections import Counter
-    words = []
+    all_words = []
     for msg in messages:
-        words.extend(msg.split(":")[1].lower().split())
-    repeated = {word for word, count in Counter(words).items() if count > 1}
-    return f"Common repeated words: {repeated}"
+        all_words.extend(msg.split(":")[1].strip().lower().split())
+    return {word for word, count in Counter(all_words).items() if count > 1}
 
-def longest_avg_message_user(messages):
+def user_with_longest_avg_message(messages):
     from collections import defaultdict
     user_lengths = defaultdict(list)
     for msg in messages:
-        user, text = msg.split(":", 1)
-        user_lengths[user].append(len(text.split()))
-    avg_lengths = {u: sum(l)/len(l) for u,l in user_lengths.items()}
-    user = max(avg_lengths, key=avg_lengths.get)
-    return f"User with longest average message: {user} ({round(avg_lengths[user],2)} words)"
+        user, text = msg.split(":")
+        user_lengths[user.strip()].append(len(text.strip().split()))
+    avg_lengths = {user: sum(lengths)/len(lengths) for user, lengths in user_lengths.items()}
+    max_user = max(avg_lengths, key=avg_lengths.get)
+    return max_user, round(avg_lengths[max_user], 2)
 
 def messages_mentioning_user(messages, username):
-    count = sum(1 for msg in messages if username.lower() in msg.lower())
-    return f"Messages mentioning '{username}': {count}"
+    return sum(1 for msg in messages if username.lower() in msg.lower())
 
 def remove_duplicate_messages(messages):
-    unique_msgs = list(dict.fromkeys(messages))
-    return f"Unique messages count: {len(unique_msgs)}"
+    return list(set(messages))
 
-def sort_messages(messages):
-    return "\n".join(sorted(messages))
+def sort_messages_alphabetically(messages):
+    return sorted(messages)
 
 def extract_questions(messages):
-    return "\n".join(msg for msg in messages if "?" in msg)
-
-def check_deleted(messages):
-    deleted = sum(1 for msg in messages if "This message was deleted" in msg)
-    return f"Deleted messages found: {deleted}"
+    return [msg for msg in messages if "?" in msg]
 
 def reply_ratio(messages, user1, user2):
-    replies = sum(1 for i in range(1, len(messages))
-                  if messages[i].startswith(user2 + ":") and messages[i-1].startswith(user1 + ":"))
-    return f"Reply ratio from {user2} to {user1}: {replies} replies"
-
-def longest_streak(messages):
-    max_streak, current_streak, current_user = 1, 1, messages[0].split(":")[0]
-    best_user = current_user
+    replies = 0
     for i in range(1, len(messages)):
-        user = messages[i].split(":")[0]
-        if user == current_user:
-            current_streak += 1
-            if current_streak > max_streak:
-                max_streak, best_user = current_streak, user
-        else:
-            current_streak, current_user = 1, user
-    return f"Longest streak: {best_user} ({max_streak} messages)"
+        if messages[i].startswith(user2 + ":") and user1 in messages[i - 1]:
+            replies += 1
+    return replies
 
-def most_active_hour(messages):
-    # Fake time analysis since timestamps not given
-    # Assumption: we'll use message index as "time"
-    hour_counts = {}
-    for i, msg in enumerate(messages):
-        hour = i % 24   # simulate hour from index
-        hour_counts[hour] = hour_counts.get(hour, 0) + 1
-    best_hour = max(hour_counts, key=hour_counts.get)
-    return f"Most active hour (simulated): {best_hour}:00 with {hour_counts[best_hour]} messages"
-
-
-# --------------------------
-# Main Menu
-# --------------------------
+def check_deleted_messages(messages):
+    return [msg for msg in messages if msg.strip().endswith("This message was deleted")]
 
 def main():
-    messages = []
-    n = int(input("Enter number of messages: "))
-    for _ in range(n):
-        messages.append(input())
-
+    messages = get_messages()
     while True:
-        print("\n--- WhatsApp Chat Analysis Menu ---")
-        print("1. Count total number of messages")
+        print("\nWhatsApp Chat Analysis Menu")
+        print("1. Count total messages")
         print("2. Identify unique users")
         print("3. Count total words")
-        print("4. Calculate average words per message")
+        print("4. Average words per message")
         print("5. Find longest message")
-        print("6. Find most active user")
-        print("7. Message count for specific user")
-        print("8. Most frequent word by specific user")
-        print("9. First and last message of a user")
-        print("10. Check if user is present")
-        print("11. Find common repeated words")
+        print("6. Most active user")
+        print("7. Message count for a user")
+        print("8. Most frequent word by user")
+        print("9. First and last message by user")
+        print("10. Check user presence")
+        print("11. Common repeated words")
         print("12. User with longest average message")
         print("13. Messages mentioning a user")
         print("14. Remove duplicate messages")
         print("15. Sort messages alphabetically")
-        print("16. Extract all questions")
-        print("17. Check for deleted messages")
-        print("18. Calculate reply ratio between 2 users")
-        print("19. Longest streak of a single user")
-        print("20. Most active hour (simulated)")
-        print("0. Exit")
+        print("16. Extract questions")
+        print("17. Reply ratio between two users")
+        print("18. Check for deleted messages")
+        print("19. Exit")
 
-        choice = int(input("Enter choice: "))
-        
-        if choice == 0:
-            break
-        elif choice == 1:
-            print(count_total_messages(messages))
+        choice = int(input("Enter your choice: "))
+        if choice == 1:
+            print("Total messages:", count_total_messages(messages))
         elif choice == 2:
-            print(unique_users(messages))
+            print("Unique users:", identify_unique_users(messages))
         elif choice == 3:
-            print(total_words(messages))
+            print("Total words:", count_total_words(messages))
         elif choice == 4:
-            print(avg_words_per_message(messages))
+            print("Average words per message:", average_words_per_message(messages))
         elif choice == 5:
-            print(longest_message(messages))
+            print("Longest message:", find_longest_message(messages))
         elif choice == 6:
-            print(most_active_user(messages))
+            user, count = most_active_user(messages)
+            print(f"Most active user: {user} ({count} messages)")
         elif choice == 7:
             user = input("Enter username: ")
-            print(message_count_for_user(messages, user))
+            print(f"Messages sent by {user}:", message_count_for_user(messages, user))
         elif choice == 8:
             user = input("Enter username: ")
-            print(most_frequent_word_by_user(messages, user))
+            word, count = most_frequent_word_by_user(messages, user)
+            print(f"Most frequent word by {user}: '{word}' ({count} times)")
         elif choice == 9:
             user = input("Enter username: ")
-            print(first_and_last_message(messages, user))
+            first, last = first_and_last_message_by_user(messages, user)
+            print("First message:", first)
+            print("Last message:", last)
         elif choice == 10:
             user = input("Enter username: ")
-            print(check_user_presence(messages, user))
+            print("User found:" if check_user_presence(messages, user) else "User not found.")
         elif choice == 11:
-            print(common_repeated_words(messages))
+            print("Common repeated words:", find_common_words(messages))
         elif choice == 12:
-            print(longest_avg_message_user(messages))
+            user, avg = user_with_longest_avg_message(messages)
+            print(f"User with longest average message: {user} ({avg} words)")
         elif choice == 13:
-            user = input("Enter username: ")
-            print(messages_mentioning_user(messages, user))
+            user = input("Enter username to check mentions: ")
+            print(f"Messages mentioning '{user}':", messages_mentioning_user(messages, user))
         elif choice == 14:
-            print(remove_duplicate_messages(messages))
+            unique_msgs = remove_duplicate_messages(messages)
+            print("Unique messages count:", len(unique_msgs))
         elif choice == 15:
-            print(sort_messages(messages))
+            print("Sorted messages:")
+            for msg in sort_messages_alphabetically(messages):
+                print(msg)
         elif choice == 16:
-            print(extract_questions(messages))
+            print("Questions asked:")
+            for msg in extract_questions(messages):
+                print(msg)
         elif choice == 17:
-            print(check_deleted(messages))
-        elif choice == 18:
             u1 = input("Enter first user: ")
             u2 = input("Enter second user: ")
-            print(reply_ratio(messages, u1, u2))
+            print(f"Reply ratio from {u2} to {u1}:", reply_ratio(messages, u1, u2))
+        elif choice == 18:
+            deleted = check_deleted_messages(messages)
+            print("Deleted messages found:", len(deleted))
+            for msg in deleted:
+                print(msg)
         elif choice == 19:
-            print(longest_streak(messages))
-        elif choice == 20:
-            print(most_active_hour(messages))
+            print("Exiting program.")
+            break
         else:
-            print("Invalid choice!")
+            print("Invalid choice. Try again.")
 
-if __name__ == "__main__":
-   main()
+if __name__ == "_main_":
+    main()
