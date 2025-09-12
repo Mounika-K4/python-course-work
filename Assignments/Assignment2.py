@@ -1,88 +1,15 @@
 # WhatsApp Chat Data Analysis Assignment
 
-def count_messages(messages):
-    return len(messages)
-
-def unique_users(messages):
-    return {msg.split(":")[0] for msg in messages}
-
-def total_words(messages):
-    return sum(len(msg.split()) - 1 for msg in messages)  # exclude name
-
 def average_words(messages):
-    return total_words(messages) / len(messages)
-
-def longest_message(messages):
-    return max(messages, key=lambda x: len(x))
-
-def most_active_user(messages):
-    from collections import Counter
-    users = [msg.split(":")[0] for msg in messages]
-    user_count = Counter(users)
-    user, count = user_count.most_common(1)[0]
-    return user, count
-
-def message_count_user(messages, user):
-    return sum(1 for msg in messages if msg.startswith(user + ":"))
-
-def frequent_word_user(messages, user):
-    from collections import Counter
-    words = []
-    for msg in messages:
-        if msg.startswith(user + ":"):
-            words.extend(msg.split()[1:])  # exclude name
-    return Counter(words).most_common(1)[0] if words else None
-
-def first_last_message(messages, user):
-    user_msgs = [msg for msg in messages if msg.startswith(user + ":")]
-    if user_msgs:
-        return user_msgs[0], user_msgs[-1]
-    return None, None
-
-def check_user_present(messages, user):
-    users = unique_users(messages)
-    return user in users
-
-def common_repeated_words(messages):
-    from collections import Counter
-    words = []
-    for msg in messages:
-        words.extend(msg.split()[1:])  # exclude name
-    return {word for word, count in Counter(words).items() if count > 1}
-
-def longest_avg_message(messages):
-    from collections import defaultdict
-    word_counts = defaultdict(list)
-    for msg in messages:
-        user, text = msg.split(":", 1)
-        word_counts[user].append(len(text.split()))
-    avg_lengths = {user: sum(lengths)/len(lengths) for user, lengths in word_counts.items()}
-    return max(avg_lengths.items(), key=lambda x: x[1])
-
-def mentions_of_user(messages, user):
-    return sum(1 for msg in messages if user in msg.split()[1:])
-
-def remove_duplicates(messages):
-    return list(set(messages))
-
-def sort_messages(messages):
-    return sorted(messages)
-
-def extract_questions(messages):
-    return [msg for msg in messages if "?" in msg]
+    return total_words(messages) / len(messages) if messages else 0
 
 def reply_ratio(messages, user1, user2):
+    """Count how many times user2 replies immediately after user1"""
     count = 0
     for i in range(1, len(messages)):
-        if messages[i-1].startswith(user1 + ":") and messages[i].startswith(user2 + ":"):
+        if messages[i-1].lower().startswith(user1.lower() + ":") and messages[i].lower().startswith(user2.lower() + ":"):
             count += 1
     return count
-
-def deleted_messages(messages):
-    return sum(1 for msg in messages if "This message was deleted" in msg)
-
-
-# ---------------- MAIN PROGRAM ----------------
 
 def main():
     n = int(input("Enter the number of messages: "))
@@ -101,12 +28,13 @@ def main():
         print("9. Retrieve first and last message by a user")
         print("10. Check if a user is present")
         print("11. Find commonly repeated words")
+        print("12. Identify user with shortest average message length")   # new
         print("13. Identify user with longest average message length")
         print("14. Count messages mentioning a user")
         print("15. Remove duplicate messages")
         print("16. Sort messages alphabetically")
         print("17. Extract all questions")
-        print("18. Calculate reply ratio between two users")
+        print("18. Calculate reply count between two users")
         print("19. Check for deleted messages")
         print("0. Exit")
 
@@ -151,6 +79,10 @@ def main():
             print(f"User '{user}' present:", check_user_present(messages, user))
         elif choice == 11:
             print("Common repeated words:", common_repeated_words(messages))
+        elif choice == 12:
+            # new feature: shortest avg message
+            user, avg = min(longest_avg_message(messages), key=lambda x: x[1])
+            print(f"User with shortest avg message: {user} ({round(avg,2)} words)")
         elif choice == 13:
             user, avg = longest_avg_message(messages)
             print(f"User with longest avg message: {user} ({round(avg,2)} words)")
@@ -167,11 +99,11 @@ def main():
         elif choice == 18:
             u1 = input("Enter first user: ")
             u2 = input("Enter second user: ")
-            print(f"Reply ratio from {u2} to {u1}: {reply_ratio(messages, u1, u2)} replies")
+            print(f"Replies from {u2} to {u1}: {reply_ratio(messages, u1, u2)}")
         elif choice == 19:
             print("Deleted messages found:", deleted_messages(messages))
         else:
             print("Invalid choice!")
 
-if __name__ == "_main_":
+if __name__ == "__main__":
     main()
